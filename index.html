@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena Intelligence — AI Competitive Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing" class="page active">
+  <nav class="nav">
+    <div class="nav-logo">Arena<span class="logo-dot">.</span></div>
+    <div class="nav-right">
+      <span class="nav-badge">Enterprise Beta</span>
+      <button class="btn-ghost" onclick="showSetup()">Get started</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-eyebrow">AI-Powered Competitive Intelligence</div>
+    <h1 class="hero-title">Know every move<br>your market makes.</h1>
+    <p class="hero-sub">Type your brand. Pick your category. Arena researches the entire competitive landscape — globally, nationally, down to state and city level — in seconds.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="showSetup()">Launch your dashboard</button>
+      <div class="hero-examples">
+        <span class="ex-chip" onclick="quickLaunch('Nike','Running shoes','Global')">Nike / Running shoes</span>
+        <span class="ex-chip" onclick="quickLaunch('Dell','Laptops','Global')">Dell / Laptops</span>
+        <span class="ex-chip" onclick="quickLaunch('Coca-Cola','Beverages','USA — State level')">Coca-Cola / Beverages</span>
+        <span class="ex-chip" onclick="quickLaunch('Samsung','Smartphones','Asia Pacific')">Samsung / Smartphones</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feat-card">
+      <div class="feat-icon">&#9670;</div>
+      <div class="feat-title">Global to city-level</div>
+      <div class="feat-desc">Drill from worldwide share to individual states, cities, and regions. See exactly where competitors are winning.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">&#9670;</div>
+      <div class="feat-title">Any brand, any category</div>
+      <div class="feat-desc">CPG, tech, fashion, FMCG, automotive — Arena generates real intelligence for any vertical, any geography.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">&#9670;</div>
+      <div class="feat-title">Board-ready in seconds</div>
+      <div class="feat-desc">Executive summaries, share trend charts, strategic threats and opportunities — structured for VP and C-suite consumption.</div>
+    </div>
+  </section>
+</div>
+
+<!-- SETUP MODAL -->
+<div id="setupModal" class="modal-overlay" onclick="closeSetupIfOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Configure your intelligence briefing</div>
+      <button class="modal-close" onclick="hideSetup()">&#10005;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Your brand</label>
+          <input id="brandInput" type="text" placeholder="e.g. Nike, Dell, Samsung, Unilever" />
+        </div>
+        <div class="form-field">
+          <label>Product category</label>
+          <input id="catInput" type="text" placeholder="e.g. Running shoes, Laptops, Skincare" />
+        </div>
+      </div>
+
+      <div class="form-section-label">Geographic scope</div>
+      <div class="geo-grid" id="geoGrid">
+        <div class="geo-card active" data-geo="Global" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127760;</div>
+          <div class="geo-name">Global</div>
+          <div class="geo-desc">Worldwide view</div>
+        </div>
+        <div class="geo-card" data-geo="North America" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127758;</div>
+          <div class="geo-name">North America</div>
+          <div class="geo-desc">US, Canada, Mexico</div>
+        </div>
+        <div class="geo-card" data-geo="Europe" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127757;</div>
+          <div class="geo-name">Europe</div>
+          <div class="geo-desc">EU + UK markets</div>
+        </div>
+        <div class="geo-card" data-geo="Asia Pacific" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127759;</div>
+          <div class="geo-name">Asia Pacific</div>
+          <div class="geo-desc">APAC countries</div>
+        </div>
+        <div class="geo-card" data-geo="India" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127470;&#127475;</div>
+          <div class="geo-name">India</div>
+          <div class="geo-desc">State &amp; city level</div>
+        </div>
+        <div class="geo-card" data-geo="USA — State level" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127482;&#127480;</div>
+          <div class="geo-name">USA States</div>
+          <div class="geo-desc">State-by-state view</div>
+        </div>
+        <div class="geo-card" data-geo="Latin America" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127463;&#127479;</div>
+          <div class="geo-name">Latin America</div>
+          <div class="geo-desc">LATAM markets</div>
+        </div>
+        <div class="geo-card" data-geo="Middle East & Africa" onclick="selectGeo(this)">
+          <div class="geo-icon">&#127464;&#127466;</div>
+          <div class="geo-name">MEA</div>
+          <div class="geo-desc">Middle East &amp; Africa</div>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:20px">
+        <div class="form-field">
+          <label>Time window</label>
+          <select id="timeInput">
+            <option value="Last 12 months">Last 12 months</option>
+            <option value="Last 6 months">Last 6 months</option>
+            <option value="Last quarter">Last quarter</option>
+            <option value="Last 2 years">Last 2 years</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Intelligence depth</label>
+          <select id="depthInput">
+            <option value="executive">Executive briefing</option>
+            <option value="detailed">Detailed analysis</option>
+            <option value="deep">Deep dive</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:12px 14px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);border-radius:8px;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;">
+        &#9679; <strong style="color:#93c5fd">Demo mode</strong> — full intelligence generated instantly. Connect your Anthropic API key later for live AI research on any brand.
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="hideSetup()">Cancel</button>
+      <button class="btn-primary" onclick="runAnalysis()">Generate intelligence &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashPage" class="page">
+  <nav class="nav nav-dark">
+    <div class="nav-logo nav-logo-dark">Arena<span class="logo-dot-dark">.</span></div>
+    <div class="nav-center" id="navContext"></div>
+    <div class="nav-right">
+      <button class="btn-outline-light" onclick="showSetup()">New analysis</button>
+      <button class="btn-outline-light" onclick="exportPDF()">Export PDF</button>
+    </div>
+  </nav>
+
+  <div class="dash-shell" id="dashShell">
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-orb"></div>
+      <div class="loading-text" id="loadingText">Researching competitive landscape...</div>
+      <div class="loading-steps" id="loadingSteps"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
